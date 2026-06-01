@@ -2,9 +2,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
-import os
 from dotenv import load_dotenv
-from typing import List
+import os
+from typing import List, Optional
 
 load_dotenv()
 
@@ -29,14 +29,14 @@ class ChatRequest(BaseModel):
 async def chat(request: ChatRequest):
     try:
         messages = [
-            {"role": "system", "content": "You are Aether, a highly intelligent, honest, and practical AI agent. The user is from Pakistan and is planning to start a scrap metal melting business (mainly aluminum). Be direct, useful, and give real business advice. Also support them emotionally if needed."}
+            {"role": "system", "content": "You are Aether, a highly intelligent, honest, and practical AI agent. The user is from Pakistan and is planning to start a scrap metal melting business (mainly aluminum). Be direct, useful, and give real business advice. Also support them emotionally when needed."}
         ] + request.history + [{"role": "user", "content": request.message}]
 
         completion = client.chat.completions.create(
             model="llama-3.1-70b-versatile",
             messages=messages,
             temperature=0.7,
-            max_tokens=1500
+            max_tokens=1200
         )
 
         response = completion.choices[0].message.content
@@ -48,8 +48,8 @@ async def chat(request: ChatRequest):
 
 @app.get("/")
 async def root():
-    return {"message": "Aether Backend is running. Send POST requests to /api/chat"}
+    return {"message": "Aether Backend is running successfully. Send POST requests to /api/chat"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)
